@@ -1,4 +1,4 @@
-const API_URL = process.env.REACT_APP_API_URL || "http://localhost:3001/api";
+const API_URL = process.env.REACT_APP_API_URL || "https://phone-book-app.fly.dev/api";
 
 async function get<T>(path: string): Promise<T> {
   const response = await fetch(`${API_URL}${path}`);
