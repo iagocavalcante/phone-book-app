@@ -57,7 +57,7 @@ function App() {
     (async () => {
       await getContacts();
     })()
-  }, []);
+  }, [getContacts]);
 
   const closeModalAndRefreshContacts = async () => {
     setShowModal(false);
