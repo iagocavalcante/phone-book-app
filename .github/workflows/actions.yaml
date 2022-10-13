@@ -134,5 +134,7 @@ jobs:
           name: frontend-dist
           path: backend/public
       - uses: superfly/flyctl-actions/setup-flyctl@master
-      - run: flyctl deploy --remote-only
+      - run: |
+          cd backend
+          flyctl deploy --remote-only
 
