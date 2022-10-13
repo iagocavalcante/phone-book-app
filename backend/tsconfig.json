@@ -1,0 +1,14 @@
+{
+  "extends": "@tsconfig/node16/tsconfig.json",
+  "exclude": [
+    "node_modules"
+  ],
+  "compilerOptions": {
+    "outDir": "dist"
+  },
+  "include": ["src/**/*", "migrations"],
+  "paths": {
+    "*": ["node_modules"]
+  },
+  "preserveSymlinks": false
+}

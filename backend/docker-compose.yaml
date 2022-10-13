@@ -1,0 +1,20 @@
+version: "3"
+
+services:
+  database:
+    image: "postgres:latest"
+
+    ports:
+      - 6432:5432
+
+    environment:
+      POSTGRES_USER: phone
+      POSTGRES_PASSWORD: asdfasdf
+      POSTGRES_DB: phone-book
+
+    volumes:
+      - phone-book-db-data:/var/lib/postgresql/data/
+
+volumes:
+  phone-book-db-data:
+    external: true
