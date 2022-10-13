@@ -1,0 +1,170 @@
+name: Lint + Deploy
+on: [push]
+jobs:
+  lint-server:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+      - name: update npm
+        run: |
+          npm i -g npm
+      - name: npm install and run lint
+        run: |
+          cd backend
+          npm ci
+          cd server
+          npm ci --legacy-peer-deps
+          npm run lint
+
+  lint-frontend:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+      - name: update npm
+        run: |
+          npm i -g npm
+      - name: npm install and run lint
+        run: |
+          cd frontend
+          npm ci --legacy-peer-deps
+          npm run lint
+
+  build-frontend:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+      - name: Build Frontend
+        run: |
+          cd frontend
+          npm i -g npm
+          npm ci --legacy-peer-deps
+          npm run build
+      - uses: actions/upload-artifact@v3
+        with:
+          name: frontend-dist
+          path: frontend/build
+
+  build-server:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+      # TODO: Use a proper secrets manager to store database passwords and api tokens
+      - name: Install dependecies to Backend
+        run: |
+          cd backend
+          npm i -g npm
+          npm ci --legacy-peer-deps
+      - name: Build server
+        run: |
+          cd backend
+          npm i -g npm
+          npm ci --legacy-peer-deps
+          npm run build
+      - uses: actions/upload-artifact@v3
+        with:
+          name: server-dist
+          path: backend/dist
+
+  migrate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: [lint-server, lint-frontend]
+    if: github.ref == 'refs/heads/master'
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+    # Note: these steps are split out so that the logs appear separately for each one
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+      - id: 'auth'
+        uses: 'google-github-actions/auth@v0'
+        with:
+          workload_identity_provider: 'projects/773669990095/locations/global/workloadIdentityPools/gh-action-pool/providers/gh-action-provider'
+          service_account: 'github-actions-deploy-account@billy-leads-app.iam.gserviceaccount.com'
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+      - name: update npm
+        run: |
+          npm i npm
+      - name: npm install
+        run: |
+          cd backend
+          npm ci --legacy-peer-deps
+      - name: run migrations
+        env:
+          PGPASSWORD: ${{ secrets.PGPASSWORD }}
+        run: |
+          cd backend
+          npx knex migrate:latest --knexfile ./knexfile.ts --env migrate
+
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: [migrate, build-frontend, build-server]
+    env:
+      FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+    if: github.ref == 'refs/heads/master'
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v3
+      - uses: actions/download-artifact@v3
+        with:
+          name: server-dist
+          path: backend/dist
+      - uses: actions/download-artifact@v3
+        with:
+          name: frontend-dist
+          path: backend/public
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+      - run: flyctl deploy --remote-only
+
