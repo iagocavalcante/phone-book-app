@@ -41,7 +41,7 @@ jobs:
         run: |
           cd frontend
           npm i -g npm
-          npm ci --legacy-peer-deps
+          npm ci
           npm run build
       - uses: actions/upload-artifact@v3
         with:
@@ -69,7 +69,7 @@ jobs:
         run: |
           cd backend
           npm i -g npm
-          npm ci --legacy-peer-deps
+          npm ci
       - name: Build server
         run: |
           cd backend
@@ -118,7 +118,7 @@ jobs:
       - name: run migrations
         run: |
           cd backend
-          npx knex migrate:latest --knexfile ./knexfile.ts --env migrate
+          npx knex migrate:latest --knexfile ./knexfile.ts --env production
 
   deploy:
     runs-on: ubuntu-latest

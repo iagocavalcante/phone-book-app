@@ -22,26 +22,7 @@ const config: { [key: string]: Knex.Config } = {
 	production: {
 		client: 'pg',
 		connection: {
-			host: `${dbSocketPath}/billy-leads-app:us-central1:quotes`,
-			port: Number(process.env.PGPORT),
-			user: process.env.PGUSER,
-			database: process.env.PGDATABASE,
-			password: process.env.PGPASSWORD,
-		},
-		pool: { min: 2, max: 10 },
-		migrations: {
-			tableName: "knex_migrations",
-		},
-	},
-	// Note: environment used to migration prod from within github action job
-	migrate: {
-		client: 'pg',
-		connection: {
-			host: 'localhost',
-			port: 6434,
-			user: 'postgres',
-			database: 'postgres',
-			password: process.env.PGPASSWORD,
+			host: process.env.DATABASE_URL,
 		},
 		pool: { min: 2, max: 10 },
 		migrations: {
