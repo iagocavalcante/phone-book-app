@@ -81,41 +81,41 @@ jobs:
           name: server-dist
           path: backend/dist
 
-  migrate:
-    env:
-      DATABASE_URL: ${{ secrets.DATABASE_URL }}
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    needs: [lint-server]
-    if: github.ref == 'refs/heads/master'
-    permissions:
-      contents: 'read'
-      id-token: 'write'
-    # Note: these steps are split out so that the logs appear separately for each one
-    steps:
-      - name: Check out repository code
-        uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 16
-          cache: 'npm'
-          cache-dependency-path: backend/package-lock.json
-      - name: update npm
-        run: |
-          npm i npm
-      - name: npm install
-        run: |
-          cd backend
-          npm ci
-      - name: run migrations
-        run: |
-          cd backend
-          npx knex migrate:latest --knexfile ./knexfile.ts --env production
+  # migrate:
+  #   env:
+  #     DATABASE_URL: ${{ secrets.DATABASE_URL }}
+  #   runs-on: ubuntu-latest
+  #   timeout-minutes: 15
+  #   needs: [lint-server]
+  #   if: github.ref == 'refs/heads/master'
+  #   permissions:
+  #     contents: 'read'
+  #     id-token: 'write'
+  #   # Note: these steps are split out so that the logs appear separately for each one
+  #   steps:
+  #     - name: Check out repository code
+  #       uses: actions/checkout@v3
+  #     - uses: actions/setup-node@v3
+  #       with:
+  #         node-version: 16
+  #         cache: 'npm'
+  #         cache-dependency-path: backend/package-lock.json
+  #     - name: update npm
+  #       run: |
+  #         npm i npm
+  #     - name: npm install
+  #       run: |
+  #         cd backend
+  #         npm ci
+  #     - name: run migrations
+  #       run: |
+  #         cd backend
+  #         npx knex migrate:latest --knexfile ./knexfile.ts --env production
 
   deploy:
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    needs: [migrate, build-frontend, build-server]
+    needs: [build-frontend, build-server]
     env:
       FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
     if: github.ref == 'refs/heads/master'

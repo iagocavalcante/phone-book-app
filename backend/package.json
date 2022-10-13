@@ -10,7 +10,9 @@
     "build": "tsc",
     "dev": "npx tsc-watch --onSuccess \"node dist/src/index.js\"",
     "lint": "eslint --ext ts .",
-    "lint:fix": "eslint --ext ts . --fix"
+    "lint:fix": "eslint --ext ts . --fix",
+    "migrate": "npx knex migrate:up --knexfile ./knexfile.ts",
+    "migrate:prod": "npx knex migrate:up --knexfile ./knexfile.ts --env production"
   },
   "author": "Iago Cavalcante <iagoangelimc@gmail.com>",
   "license": "MIT",

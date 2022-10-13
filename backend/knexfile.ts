@@ -1,7 +1,5 @@
 import type { Knex } from "knex"
 
-const dbSocketPath = process.env.DB_SOCKET_PATH || '/cloudsql'
-
 const config: { [key: string]: Knex.Config } = {
 	development: {
 		client: "pg",
