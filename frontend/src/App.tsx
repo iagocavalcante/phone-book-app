@@ -21,24 +21,25 @@ function App() {
     message: '',
   });
 
-  const getContacts = async () => {
-    try {
-      const response = await api.get("/contacts");
-      setContacts(response as Contact[]);
-      setFilteredContacts(response as Contact[]);
-    } catch (error) {
-      setToastProperties({
-        show: true,
-        onClose: () => setToastProperties({ ...toastProperties as ToastGenericProps, show: false }),
-        title: 'Error',
-        message: 'Could not fetch contacts',
-      });
-      setTimeout(() => {
+  const getContacts = () => {
+    api.get("/contacts")
+      .then((response) => {
+        setContacts(response as Contact[]);
+        setFilteredContacts(response as Contact[]);
+      })
+      .catch((error) => {
         setToastProperties({
-          ...toastProperties as ToastGenericProps, show: false
-        })
-      }, 3000);
-    }
+          show: true,
+          onClose: () => setToastProperties({ ...toastProperties as ToastGenericProps, show: false }),
+          title: 'Error',
+          message: 'Could not fetch contacts',
+        });
+        setTimeout(() => {
+          setToastProperties({
+            ...toastProperties as ToastGenericProps, show: false
+          })
+        }, 3000);
+      })
   }
 
   const searchContactsByLastName = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -53,11 +54,7 @@ function App() {
   }
 
 
-  useEffect(() => {
-    (async () => {
-      await getContacts();
-    })()
-  }, [getContacts]);
+  getContacts();
 
   const closeModalAndRefreshContacts = async () => {
     setShowModal(false);

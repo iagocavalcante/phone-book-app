@@ -7,8 +7,7 @@
 	"extends": [
 		"eslint:recommended",
 		"plugin:@typescript-eslint/eslint-recommended",
-		"plugin:@typescript-eslint/recommended",
-		"./.eslintrc.shared"
+		"plugin:@typescript-eslint/recommended"
 	],
 	"rules": {
 		"indent": ["error", "tab"],
