@@ -43,7 +43,7 @@ const selectColumns = (aliasName: string) => ({...Object.values(contactKeyToColu
 
 const contactQueries = {
 	queryContact: async (contactBy: Partial<Contact>, txn?: typeof knex): Promise<Contact | null> => {
-		let query = (txn || knex) as Knex
+		const query = (txn || knex) as Knex
 		const result = await query.from({'c': 'contacts'})
 			.where(mapContactByToOperation(contactBy, 'c'))
 			.select('*')
@@ -63,7 +63,7 @@ const contactQueries = {
 		return contact
 	},
 	queryContactBy: async (contactBy: Partial<Contact>, txn?: typeof knex): Promise<Contact | null> => {
-		let query = (txn || knex) as Knex
+		const query = (txn || knex) as Knex
 		const result = await query.from({'c': 'contacts'})
 			.where(mapContactByToOperation(contactBy, 'c'))
 			.select(selectColumns('c'))
@@ -89,13 +89,13 @@ const contactQueries = {
 				id: contactId,
 			})
 	},
-  deleteContact: async (contactId: number, txn?: typeof knex): Promise<void> => {
-    await (txn || knex)('contacts')
-      .delete()
-      .where({
-        id: contactId,
-      })
-  },
+	deleteContact: async (contactId: number, txn?: typeof knex): Promise<void> => {
+		await (txn || knex)('contacts')
+			.delete()
+			.where({
+				id: contactId,
+			})
+	},
 	insertContact: async (contact: Partial<Contact>, txn?: typeof knex): Promise<number> => {
 		const results = await (txn || knex)('contacts')
 			.insert(mapContactByToOperation(contact))
@@ -103,7 +103,7 @@ const contactQueries = {
 		return results[0].id
 	},
 	listContacts: async (txn?: typeof knex): Promise<Contact[]> => {
-		let query = (txn || knex) as Knex
+		const query = (txn || knex) as Knex
 
 		const results = await query.from({'c': 'contacts'})
 		const contacts = [] as Contact[]

@@ -1,7 +1,7 @@
 import { Knex } from "knex"
 
 export async function up(knex: Knex): Promise<void> {
-	let tableName = 'contacts'
+	const tableName = 'contacts'
 	await knex.raw(`
 	CREATE FUNCTION last_upd_trigger_function() RETURNS trigger
 	   LANGUAGE plpgsql AS
