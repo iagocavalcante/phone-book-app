@@ -74,7 +74,7 @@ jobs:
         run: |
           cd backend
           npm i -g npm
-          npm ci --legacy-peer-deps
+          npm ci
           npm run build
       - uses: actions/upload-artifact@v3
         with:
@@ -84,7 +84,7 @@ jobs:
   migrate:
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    needs: [lint-server, lint-frontend]
+    needs: [lint-server]
     if: github.ref == 'refs/heads/master'
     permissions:
       contents: 'read'
@@ -114,10 +114,8 @@ jobs:
       - name: npm install
         run: |
           cd backend
-          npm ci --legacy-peer-deps
+          npm ci
       - name: run migrations
-        env:
-          PGPASSWORD: ${{ secrets.PGPASSWORD }}
         run: |
           cd backend
           npx knex migrate:latest --knexfile ./knexfile.ts --env migrate
