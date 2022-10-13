@@ -82,6 +82,8 @@ jobs:
           path: backend/dist
 
   migrate:
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     needs: [lint-server]
@@ -93,16 +95,6 @@ jobs:
     steps:
       - name: Check out repository code
         uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 16
-          cache: 'npm'
-          cache-dependency-path: backend/package-lock.json
-      - id: 'auth'
-        uses: 'google-github-actions/auth@v0'
-        with:
-          workload_identity_provider: 'projects/773669990095/locations/global/workloadIdentityPools/gh-action-pool/providers/gh-action-provider'
-          service_account: 'github-actions-deploy-account@billy-leads-app.iam.gserviceaccount.com'
       - uses: actions/setup-node@v3
         with:
           node-version: 16
